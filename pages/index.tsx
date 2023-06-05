@@ -30,6 +30,7 @@ type HitProps = {
 };
 
 function Hit({ hit }: HitProps) {
+  // ⬇️⬇️⬇️⬇️
   // const { isLoading, error, data } = useQuery({
   //   queryKey: ["repoData"],
   //   queryFn: () =>
