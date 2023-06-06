@@ -30,14 +30,13 @@ type HitProps = {
 };
 
 function Hit({ hit }: HitProps) {
-  // ⬇️⬇️⬇️⬇️
-  // const { isLoading, error, data } = useQuery({
-  //   queryKey: ["repoData"],
-  //   queryFn: () =>
-  //     fetch("https://api.github.com/repos/tannerlinsley/react-query").then(
-  //       (res) => res.json()
-  //     ),
-  // });
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["repoData"],
+    queryFn: () =>
+      fetch("https://api.github.com/repos/tannerlinsley/react-query").then(
+        (res) => res.json()
+      ),
+  });
 
   return (
     <>
@@ -84,6 +83,29 @@ export default function HomePage({ serverState, url }: HomePageProps) {
   );
 }
 
+export const MockApp = ({ serverState, url }: HomePageProps) => {
+  return (
+    <InstantSearchSSRProvider {...serverState}>
+      <InstantSearch
+        searchClient={client}
+        indexName="instant_search"
+        routing={{
+          router: createInstantSearchRouterNext({
+            serverUrl: url,
+            singletonRouter,
+          }),
+        }}
+        insights={true}
+      >
+        <DynamicWidgets fallbackComponent={FallbackComponent} />
+
+        <SearchBox />
+        {/* <Hits hitComponent={Hit} /> */}
+      </InstantSearch>
+    </InstantSearchSSRProvider>
+  );
+};
+
 function FallbackComponent({ attribute }: { attribute: string }) {
   return (
     <Panel header={attribute}>
@@ -96,7 +118,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> =
   async function getServerSideProps({ req }) {
     const protocol = req.headers.referer?.split("://")[0] || "https";
     const url = `${protocol}://${req.headers.host}${req.url}`;
-    const serverState = await getServerState(<HomePage url={url} />, {
+    const serverState = await getServerState(<MockApp url={url} />, {
       renderToString,
     });
 
